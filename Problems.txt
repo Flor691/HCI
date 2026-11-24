@@ -1,0 +1,19 @@
+verification when logging out
+
+typing other varbles than var
+
+
+no exact location when requesting for ride (resolve) 
+
+reversed button highlight for resident and driver
+
+cleared information when traversing from resident and driver in the create account
+
+when verifying the number, how to make the pin be sent to the phone then check if the number is correct
+
+
+for the waiting spots, make it interactive and change for each option you choose
+
+no main dashboard
+
+remove the sample data 

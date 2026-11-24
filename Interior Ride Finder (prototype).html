@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Interior Ride Finder (prototype)</title>
+<style>
+:root{--bg:#eaf3f6;--card:#fff;--ink:#12263a;--mut:#546a7b;--pri:#0e7490;--onp:#fff;--dk:#12344a;--line:#cfe0e6;--ok:#157a3d;--okb:#dcfce7;--wb:#fef3c7;--wi:#92400e;--red:#b91c1c;--chip:#e2e8f0;--hd:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0c1a26;--card:#14283a;--ink:#e6eef5;--mut:#9db2c2;--pri:#38bdf8;--onp:#06202e;--dk:#0f2231;--line:#27425a;--ok:#6ee7a0;--okb:#12361f;--wb:#3a2f0c;--wi:#fcd34d;--red:#f87171;--chip:#223a4f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0c1a26;--card:#14283a;--ink:#e6eef5;--mut:#9db2c2;--pri:#38bdf8;--onp:#06202e;--dk:#0f2231;--line:#27425a;--ok:#6ee7a0;--okb:#12361f;--wb:#3a2f0c;--wi:#fcd34d;--red:#f87171;--chip:#223a4f;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,"Segoe UI",Roboto,Arial,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--dk);z-index:10}
+#app{max-width:430px;height:100%;margin:0 auto;display:flex;flex-direction:column;background:var(--bg)}
+header{background:var(--dk);color:#fff;padding:14px 16px 12px;border-bottom:4px solid var(--pri)}
+header .top{display:flex;align-items:center;gap:10px;justify-content:space-between;font-size:12px;letter-spacing:.04em}
+header h1{margin:8px 0 0;font:700 22px/1.2 Georgia,"Times New Roman",serif}
+.tag{border:1px solid #9bb;border-radius:99px;padding:3px 10px;white-space:nowrap}
+.bk{background:none;border:0;color:#fff;font-size:22px;padding:0 6px 0 0;cursor:pointer}
+main{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px}
+nav{display:flex;border-top:1px solid var(--line);background:var(--card)}
+nav button{flex:1;background:none;border:0;padding:12px 4px;color:var(--mut);font:600 13px system-ui;cursor:pointer}
+nav button.on{color:var(--pri)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.row{display:flex;gap:12px;align-items:flex-start}
+.ic{width:44px;height:44px;border-radius:10px;background:var(--chip);display:grid;place-items:center;flex:none;font-size:20px}
+.row>div{min-width:0;flex:1}
+.nm{font-weight:700;font-size:17px}
+.mt{color:var(--mut);font-size:14px;margin-top:4px}
+.bd{display:inline-block;white-space:nowrap;border-radius:99px;padding:2px 10px;font-size:13px;font-weight:700;margin-top:6px;background:var(--chip)}
+.bd.ok{background:var(--okb);color:var(--ok)}.bd.w{background:var(--wb);color:var(--wi)}
+button.b,a.b{display:block;width:100%;text-align:center;border:2px solid var(--pri);background:var(--pri);color:var(--onp);border-radius:12px;padding:14px;font:700 16px system-ui;cursor:pointer;box-sizing:border-box}
+button.o{background:var(--card);color:var(--ink);border-color:var(--dk)}
+button.r{background:var(--card);color:var(--red);border-color:var(--red)}
+.sp{flex:1}
+label{font-weight:700;font-size:14px;display:block;margin-bottom:4px}
+input,select{width:100%;box-sizing:border-box;font:16px system-ui;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{border:1px solid var(--mut);background:var(--card);color:var(--ink);border-radius:99px;padding:8px 16px;font:600 15px system-ui;cursor:pointer}
+.chip.on{background:var(--dk);color:#fff;border-color:var(--dk)}
+.hint{font-size:13px;color:var(--mut)}.err{color:var(--red);font-size:13px;min-height:16px}
+.li{display:flex;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.li:last-child{border:0}
+.steps{display:flex;justify-content:space-between;text-align:center;font-size:12px}
+.steps div{flex:1}.steps i{display:grid;place-items:center;width:30px;height:30px;margin:0 auto 4px;border-radius:50%;border:2px solid var(--line);font-style:normal;font-weight:700}
+.steps .d i{background:var(--pri);color:var(--onp);border-color:var(--pri)}.steps .c i{border-color:var(--pri)}
+.codes{display:flex;gap:8px}.codes input{text-align:center;padding:12px 0}
+.stars{font-size:34px;text-align:center;color:#d97706;cursor:pointer}
+.tg{display:flex;align-items:center;gap:10px;font-weight:700}.tg input{width:22px;height:22px}
+#toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%);background:var(--dk);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;display:none;max-width:80%;z-index:20}
+.demo{border:1px dashed var(--mut);border-radius:10px;padding:10px;font-size:13px;color:var(--mut)}
+.demo button{margin-top:8px;padding:10px;font-size:14px}
+</style></head><body>
+<div id="app"></div><div id="toast"></div>
+<script>
+const SPOTS=[{n:"Main gate",w:20,s:"ok",u:"Updated 8:10",v:"Habal-habal, Bao-Bao",h:"6 PM to 10 PM",l:"At the main gate"},{n:"Rubber Village base",w:5,s:"",u:"",v:"Habal-habal",h:"",l:"At the bottom of the Rubber Village road"},{n:"Market",w:8,s:"",u:"",v:"Habal-habal",h:"",l:"Near the market"}];
+const S={role:"",scr:"land",spot:1,pax:1,sec:0,stars:4,ds:0,wait:0,tr:[["Main gate","8:10 PM","Done"]],dt:[["Rubber Village base","7:45 PM","1 passenger"]],reg:"resident",name:"Maria Santos",id:"",f:"All",act:0,code:"",fm:{},dest:"College Park",lm:""};
+let timer=null;
+const $=s=>document.querySelector(s);
+const toast=t=>{const e=$("#toast");e.textContent=t;e.style.display="block";setTimeout(()=>e.style.display="none",2200)};
+const go=s=>{clearInterval(timer);if(s==="spots"&&["find","acc","done"].includes(S.scr))S.act=0;S.scr=s;if(s==="find"){S.sec=0;timer=setInterval(()=>{S.sec++;const e=$("#tm");if(e)e.textContent=Math.floor(S.sec/60)+":"+String(S.sec%60).padStart(2,"0")},1000)}draw()};
+const numOnly=e=>{e.value=e.value.replace(/\D/g,"")};
+const keep=()=>{if(S.scr!=="create")return;const g=i=>document.getElementById(i);if(!g("fn"))return;S.fm={fn:g("fn").value,mb:g("mb").value,ar:g("ar").value,pl:g("pl")?g("pl").value:S.fm.pl,id:g("id").value,ag:g("ag").checked}};
+const bd=s=>s.s==="ok"?`<span class="bd ok">Drivers available</span>`:`<span class="bd">No report yet</span>`;
+const kv=(a,b)=>`<div class="li" style="cursor:default"><span class="mt" style="margin:0">${a}</span><b style="text-align:right">${b}</b></div>`;
+const NR=[["spots","Spots"],["ride","My ride"],["acct","Account"]],ND=[["dreq","Requests"],["dtrips","Trips"],["dacct","Account"]];
+const SC={
+land:()=>({t:"Welcome",nav:0,b:`<div style="text-align:center;padding:18px 0 4px"><div class="ic" style="margin:0 auto 12px;width:64px;height:64px;font-size:30px">📍</div><div class="nm" style="font-size:22px">Interior Ride Finder</div><div class="mt">Find a ride to and from home inside CMU</div></div>
+<div class="card row"><div class="ic">📍</div><div><div class="nm">See where rides wait</div><div class="mt">Spots, hours and last update</div></div></div>
+<div class="card row"><div class="ic">🛵</div><div><div class="nm">Request a ride</div><div class="mt">A driver accepts and picks you up at the spot</div></div></div>
+<div class="card row"><div class="ic">🕒</div><div><div class="nm">Know before you go</div><div class="mt">Reported fares and wait times</div></div></div>
+<div class="sp"></div><button class="b" onclick="go('signin')">Sign in</button><button class="b o" onclick="go('create')">Create account</button><div class="hint" style="text-align:center">Prototype: sample data only.</div>`}),
+signin:()=>({t:"Sign in",back:"land",nav:0,b:`<div><label>I am a</label><div class="chips"><button class="chip ${S.reg==="resident"?"on":""}" onclick="S.reg='resident';draw()">Resident</button><button class="chip ${S.reg==="driver"?"on":""}" onclick="S.reg='driver';draw()">Driver</button></div></div>
+<div><label>Mobile number</label><input inputmode="numeric" placeholder="Sample: 09XX XXX XXXX"></div><div><label>Password</label><input type="password" placeholder="Enter your password"></div>
+<div class="sp"></div><button class="b" onclick="S.role=S.reg;go(S.reg==='driver'?'dreq':'spots')">Sign in</button><div class="hint" style="text-align:center">No account? <a href="#" onclick="go('create');return false" style="color:var(--pri);font-weight:700">Create account</a></div>`}),
+create:()=>({t:"Create account",back:"land",nav:0,b:`<div><label>Full name</label><input id="fn" value="${S.fm.fn||""}" placeholder="Sample: Juan Dela Cruz"></div><div><label>Mobile number</label><input id="mb" value="${S.fm.mb||""}" inputmode="numeric" oninput="numOnly(this)" placeholder="Sample: 09XX XXX XXXX"></div>
+<div><label>Home area</label><select id="ar"><option ${S.fm.ar==="Rubber Village"?"":"selected"}>College Park</option><option ${S.fm.ar==="Rubber Village"?"selected":""}>Rubber Village</option></select></div>
+<div><label>I am a</label><div class="chips"><button class="chip ${S.reg==="resident"?"on":""}" onclick="S.reg='resident';draw()">Resident</button><button class="chip ${S.reg==="driver"?"on":""}" onclick="S.reg='driver';draw()">Driver</button></div></div>
+${S.reg==="driver"?`<div><label>Vehicle</label><select><option>Habal-habal</option></select></div><div><label>Plate number</label><input id="pl" value="${S.fm.pl||""}" placeholder="Sample: ABC 1234"></div>`:""}
+<div><label>CMU ID number (optional)</label><input id="id" value="${S.fm.id||""}" inputmode="numeric" pattern="[0-9]*" oninput="numOnly(this)" placeholder="Numbers only. Leave blank if you have none"><div class="hint">Numbers only. No letters or symbols.</div></div>
+<div class="tg"><input id="ag" type="checkbox" ${S.fm.ag?"checked":""}><label style="margin:0;font-weight:400">I agree to share these details for safety.</label></div><div class="err" id="er"></div>
+<div class="card hint">Prototype only. Use sample details, not real personal information. Who can see your details and how long they are kept will be confirmed with the Security Office.</div>
+<div class="sp"></div><button class="b" onclick="keep();const n=$('#fn').value.trim();if(!n){$('#er').textContent='Enter your name.';return}if(!$('#ag').checked){$('#er').textContent='Agree to share your details to continue.';return}S.name=n;S.id=$('#id').value;S.code=String(100000+Math.floor(Math.random()*900000));go('verify')">Create account</button>`}),
+verify:()=>({t:"Verify your number",back:"create",nav:0,b:`<div class="mt">Enter the 6-digit code sent to 09XX XXX XXXX (sample).</div><div class="codes">${[0,1,2,3,4,5].map(i=>`<input maxlength="1" inputmode="numeric" oninput="numOnly(this);if(this.value&&this.nextElementSibling)this.nextElementSibling.focus()">`).join("")}</div><div class="card">Sample code (no real text message is sent in this prototype): <b>${S.code}</b></div><div class="err" id="ve"></div><div class="hint" style="text-align:center;cursor:pointer" onclick="S.code=String(100000+Math.floor(Math.random()*900000));draw()">Resend code</div><div class="card hint">Your details are recorded for safety. Prototype only.</div><div class="sp"></div><button class="b" onclick="const v=[...document.querySelectorAll('.codes input')].map(i=>i.value).join('');if(v!==S.code){$('#ve').textContent='Wrong code. Check the code shown above.';return}S.role=S.reg;go(S.reg==='driver'?'dreq':'spots')">Verify</button>`}),
+spots:()=>({t:"Waiting spots",nav:"r",b:`<div class="mt" style="margin:0">Good evening, ${S.name}<br>Now 8:40 PM</div>${S.act?`<div class="card row" style="cursor:pointer;border-color:var(--pri)" onclick="go('find')"><div class="ic">🛵</div><div><div class="nm">Active ride request</div><div class="mt">Pickup: ${SPOTS[S.spot].n}. Tap to view.</div></div></div>`:`<div class="card"><b>No active ride.</b> <span class="mt">Choose a spot below, then request a ride.</span></div>`}<div class="chips">${["All","Habal-habal","Bao-Bao"].map(f=>`<button class="chip ${S.f===f?"on":""}" onclick="S.f='${f}';draw()">${f}</button>`).join("")}</div>
+${SPOTS.map((s,i)=>S.f!=="All"&&!s.v.includes(S.f)?"":`<div class="card row" style="cursor:pointer" onclick="S.spot=${i};go('spot')"><div class="ic">📍</div><div><div class="nm">${s.n}</div>${bd(s)}<div class="mt">${s.w} min walk${s.u?". "+s.u:""}</div><div class="mt">${s.v}</div></div></div>`).join("")}
+<div class="sp"></div><button class="b" onclick="go('req')">Request a ride from ${SPOTS[S.spot].n}</button>`}),
+spot:()=>{const s=SPOTS[S.spot];return{t:s.n,back:"spots",nav:"r",b:`<div class="card"><div class="hint">Where to find it</div>${s.l}</div><div class="card">${bd(s)}${kv("Walking time",s.w+" min")}${kv("Vehicles",s.v)}${kv("Usual hours",s.h||"[shown once reported]")}${kv("Last updated",s.u||"[none yet]")}</div><div class="sp"></div><button class="b" onclick="go('req')">Request a ride from here</button><button class="b o" onclick="toast('Report sent (sample)')">Report outdated info</button>`}},
+req:()=>({t:"Request a ride",back:"spots",nav:0,b:`<div class="card row"><div class="ic">📍</div><div><div class="hint">Pickup spot</div><select onchange="S.spot=this.value;draw()">${SPOTS.map((s,i)=>`<option value="${i}" ${i==S.spot?"selected":""}>${s.n}</option>`).join("")}</select><div class="mt">${SPOTS[S.spot].w} min walk from your home</div></div></div>
+<div><label>Passengers</label><select onchange="S.pax=this.value">${[1,2,3].map(n=>`<option ${n==S.pax?"selected":""}>${n}</option>`).join("")}</select></div><div><label>Going to</label><select onchange="S.dest=this.value">${["College Park","Rubber Village","Main gate","Market"].map(x=>`<option ${x===S.dest?"selected":""}>${x}</option>`).join("")}</select></div><div><label>Boarding house or landmark (so the driver can find you)</label><input value="${S.lm}" oninput="S.lm=this.value" placeholder="Example: Mang Tonyo boarding house, near the chapel"></div>
+<div class="card"><div class="hint">Fare</div>Agree on the fare with the driver. Reported fares will show here.</div><div class="hint">Drivers may accept or decline your request.</div><div class="sp"></div><button class="b" onclick="S.act=1;go('find')">Send request</button><button class="b o" onclick="go('spots')">Cancel</button>`}),
+find:()=>({t:"Finding a driver",back:"spots",nav:0,b:`<div style="text-align:center;padding:20px"><div style="font-size:40px">⏳</div><div class="nm">Waiting for a driver</div><div class="mt">Waiting for a driver to accept. <span id="tm">0:00</span></div></div><div class="card">${kv("Pickup",SPOTS[S.spot].n)}${kv("Passengers",S.pax)}</div><div class="hint">If nobody accepts in 5 minutes, you can keep waiting, try another spot or cancel.</div>
+<div class="demo">Prototype controls<button class="b o" onclick="go('acc')">Demo: a driver accepts</button><button class="b o" onclick="go('nod')">Demo: no driver accepts</button></div><div class="sp"></div><button class="b r" onclick="go('spots')">Cancel request</button>`}),
+nod:()=>({t:"No driver yet",back:"spots",nav:0,b:`<div class="card" style="background:var(--wb);color:var(--wi)">No driver has accepted your request yet.</div><div class="card"><div class="hint">What you can do</div>Keep waiting, try another spot, or cancel. You can also ask a friend or family member for a ride.</div><div class="sp"></div><button class="b" onclick="go('find')">Keep waiting</button><button class="b o" onclick="go('spots')">See other spots</button><button class="b r" onclick="go('spots')">Cancel request</button>`}),
+acc:()=>({t:"Driver accepted",nav:"r",b:`<div class="card"><div class="steps"><div class="d"><i>✓</i>Request sent</div><div class="c"><i>2</i><b>Driver accepted</b></div><div><i>3</i>Pickup</div><div><i>4</i>Done</div></div></div>
+<div class="card row"><div class="ic">👤</div><div><div class="nm">Jose Ramirez</div><div class="mt">Habal-habal. Plate ABC 1234</div><span class="bd ok">About 5 min to the spot</span><div class="mt">Pickup: ${SPOTS[S.spot].n}</div></div></div>
+<div class="demo">Prototype controls<button class="b o" onclick="go('done')">Demo: ride completed</button></div><div class="sp"></div><button class="b o" onclick="toast('Trip shared with your contact (sample)')">Share trip</button><button class="b r" onclick="go('spots')">Cancel request</button>`}),
+ride:()=>({t:"My ride",nav:"r",b:`<div class="card">No active ride. Pick a spot to request one.</div>${S.tr.map(t=>`<div class="card">${kv(t[0],t[1])}<div class="mt">${t[2]}</div></div>`).join("")}<div class="sp"></div><button class="b" onclick="go('spots')">Find a ride</button>`}),
+done:()=>({t:"Ride complete",nav:0,b:`<div style="text-align:center;padding:10px"><div style="font-size:40px">✅</div><div class="nm">You have arrived</div></div>
+<div><label>Fare paid (optional)</label><input inputmode="numeric" oninput="numOnly(this)" placeholder="Amount in pesos"><div class="hint">Reported fares help other residents.</div></div><div class="sp"></div><button class="b o" onclick="go('help')">Report a problem</button><button class="b" onclick="S.tr.unshift([SPOTS[S.spot].n,'Just now','Done']);go('spots')">Done</button>`}),
+help:()=>({t:"How it works",back:S.role==="driver"?"dacct":"acct",nav:S.role==="driver"?"d":"r",b:`${[["📍","1. Pick a spot","See where rides wait and when it was last updated."],["🛵","2. Send a request","A driver can accept or decline."],["✅","3. Meet at the spot","Agree on the fare with the driver."]].map(x=>`<div class="card row"><div class="ic">${x[0]}</div><div><div class="nm">${x[1]}</div><div class="mt">${x[2]}</div></div></div>`).join("")}<div class="sp"></div><button class="b o" onclick="toast('Report sent (sample)')">Report a problem</button>`}),
+so:()=>({t:"Sign out?",nav:0,b:`<div class="card">Are you sure you want to sign out?</div><div class="sp"></div><button class="b r" onclick="S.role='';go('land')">Sign out</button><button class="b o" onclick="go(S.role==='driver'?'dacct':'acct')">Cancel</button>`}),
+acct:()=>({t:"Account",nav:"r",b:`<div class="card row"><div class="ic">👤</div><div><div class="nm">${S.name}</div><div class="mt">College Park</div><span class="bd">Resident</span></div></div><div class="card"><div class="li" onclick="go('pd')">Personal details <b>&gt;</b></div><div class="li" onclick="go('ride')">Ride history <b>&gt;</b></div><div class="li" onclick="go('help')">Help <b>&gt;</b></div><div class="li" onclick="go('so')">Sign out <b>&gt;</b></div></div>`}),
+pd:()=>({t:"Personal details",back:S.role==="driver"?"dacct":"acct",nav:S.role==="driver"?"d":"r",b:`<div class="card">${kv("Name",S.name)}${kv("Mobile","09XX XXX XXXX")}${kv("CMU ID",S.id||"None")}</div><div class="hint">Sample data only. Who can see these details and how long they are kept will be confirmed with the Security Office.</div>`}),
+dreq:()=>({t:"Requests",nav:"d",b:`<div class="card"><div class="tg"><input type="checkbox" ${S.wait?"":"checked"} onchange="S.wait=this.checked?0:1">I am available</div></div>
+<div class="card"><div><label>Where I wait</label><select>${SPOTS.map(s=>`<option>${s.n}</option>`).join("")}</select></div><div style="margin-top:10px"><label>My hours</label><select><option>6 PM to 10 PM</option><option>8 PM to 12 AM</option><option>Flexible</option></select></div></div>
+${S.wait?`<div class="card">You are offline. Turn on “I am available” to see requests.</div>`:[["Rubber Village base","1 passenger, 2 min ago"],["Main gate","2 passengers, 6 min ago"]].map(r=>`<div class="card"><div class="nm">${r[0]}</div><div class="mt">${r[1]}</div><div class="row" style="margin-top:10px"><button class="b o" onclick="toast('Declined (sample)')">Decline</button><button class="b" onclick="S.ds=0;go('dpick')">Accept</button></div></div>`).join("")}
+<div class="hint">Accepting shares your name and plate number with the resident.</div>`}),
+dpick:()=>{const L=["I have arrived","Start ride","Complete ride"];return{t:"Pickup details",back:"dreq",nav:"d",b:`<div class="card"><div class="hint">Resident</div><div class="nm">Maria</div>${kv("Pickup spot","Rubber Village base")}${kv("Passengers",1)}${kv("Going to",S.dest)}${kv("Landmark",S.lm||"Not given")}</div><span class="bd ok" style="align-self:flex-start">${["Accepted. Go to the spot.","Resident is at the spot.","Ride in progress."][S.ds]}</span><div class="sp"></div>
+<button class="b" onclick="S.ds<2?(S.ds++,draw()):go('ddone')">${L[S.ds]}</button><button class="b r" onclick="go('dreq')">Cancel pickup</button>`}},
+ddone:()=>({t:"Ride complete",nav:0,b:`<div style="text-align:center;padding:10px"><div style="font-size:40px">✅</div><div class="nm">Ride completed</div></div><div><label>Fare charged (optional)</label><input inputmode="numeric" oninput="numOnly(this)" placeholder="Amount in pesos"><div class="hint">Reported fares help residents know what to expect.</div></div><div class="sp"></div><button class="b o" onclick="toast('Report sent (sample)')">Report a problem</button><button class="b" onclick="S.dt.unshift(['Rubber Village base','Just now','1 passenger']);go('dreq')">Done</button>`}),
+dtrips:()=>({t:"Trips",nav:"d",b:`<div class="card">${kv("Trips this week",S.dt.length)}</div>${S.dt.map(t=>`<div class="card"><div class="nm">${t[0]}</div><div class="mt">${t[1]}. ${t[2]}</div></div>`).join("")}`}),
+dacct:()=>({t:"Account",nav:"d",b:`<div class="card row"><div class="ic">🛵</div><div><div class="nm">${S.name}</div><div class="mt">Habal-habal. Plate ABC 1234</div><span class="bd w">Sample profile</span></div></div><div class="card"><div class="li" onclick="go('pd')">Personal details <b>&gt;</b></div><div class="li" onclick="go('dtrips')">Trip history <b>&gt;</b></div><div class="li" onclick="go('help')">Help <b>&gt;</b></div><div class="li" onclick="go('so')">Sign out <b>&gt;</b></div></div><div class="hint">Real driver verification is outside this prototype. Sample data only.</div>`})
+};
+function draw(){keep();const c=SC[S.scr](),d=S.role==="driver";
+$("#app").innerHTML=`<header><div class="top"><span>${c.back?`<button class="bk" onclick="go('${c.back}')" aria-label="Back">‹</button>`:""}INTERIOR RIDE FINDER</span><span class="tag">${d?"Driver view":"Prototype"}</span></div><h1>${c.t}</h1></header><main>${c.b}</main>${c.nav?`<nav>${(c.nav==="d"?ND:NR).map(n=>`<button class="${S.scr===n[0]?"on":""}" onclick="go('${n[0]}')">${n[1]}</button>`).join("")}</nav>`:""}`}
+draw();
+</script></body></html>
